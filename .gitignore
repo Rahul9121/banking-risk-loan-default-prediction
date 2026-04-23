@@ -1,0 +1,17 @@
+.venv/
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+artifacts/*
+!artifacts/.gitkeep
+
+data/*
+!data/.gitkeep
+
+.streamlit/secrets.toml
