@@ -1,4 +1,5 @@
 from __future__ import annotations
+import tempfile
 
 from pathlib import Path
 
@@ -10,16 +11,19 @@ from src.data import create_demo_dataset
 from src.modeling import load_artifacts
 from src.scoring import build_delinquency_trend, build_risk_segmentation, score_portfolio
 from src.training import train_and_persist
-
-ROOT_DIR = Path(__file__).resolve().parent
-ARTIFACTS_DIR = ROOT_DIR / "artifacts"
+RUNTIME_DIR = Path(tempfile.gettempdir()) / "credit_risk_streamlit_runtime"
+DATA_DIR = RUNTIME_DIR / "data"
+ARTIFACTS_DIR = RUNTIME_DIR / "artifacts"
 MODEL_PATH = ARTIFACTS_DIR / "model.joblib"
 METADATA_PATH = ARTIFACTS_DIR / "metadata.json"
-DEMO_DATA_PATH = ROOT_DIR / "data" / "demo_loan_data.csv"
+DEMO_DATA_PATH = DATA_DIR / "demo_loan_data.csv"
+
+DATA_DIR.mkdir(parents=True, exist_ok=True)
+ARTIFACTS_DIR.mkdir(parents=True, exist_ok=True)
 
 
 @st.cache_data(show_spinner=False)
-def load_demo_portfolio(rows: int = 3500) -> pd.DataFrame:
+def load_demo_portfolio(rows: int = 2500) -> pd.DataFrame:
     if DEMO_DATA_PATH.exists():
         return pd.read_csv(DEMO_DATA_PATH)
 
@@ -31,7 +35,11 @@ def load_demo_portfolio(rows: int = 3500) -> pd.DataFrame:
 
 def ensure_artifacts() -> None:
     if not MODEL_PATH.exists() or not METADATA_PATH.exists():
-        train_and_persist(dataset_path=DEMO_DATA_PATH, output_dir=ARTIFACTS_DIR)
+        train_and_persist(
+            dataset_path=DEMO_DATA_PATH,
+            output_dir=ARTIFACTS_DIR,
+            candidate_models=("logistic",),
+        )
 
 
 def load_model_bundle() -> tuple[object, dict]:
@@ -56,7 +64,11 @@ with st.sidebar:
     st.subheader("Model")
     if st.button("Retrain model on demo data"):
         with st.spinner("Training model..."):
-            train_and_persist(dataset_path=DEMO_DATA_PATH, output_dir=ARTIFACTS_DIR)
+            train_and_persist(
+                dataset_path=DEMO_DATA_PATH,
+                output_dir=ARTIFACTS_DIR,
+                candidate_models=("logistic",),
+            )
         st.success("Model retrained successfully.")
 
     uploaded_training_file = st.file_uploader(
@@ -64,11 +76,15 @@ with st.sidebar:
     )
     if uploaded_training_file is not None and st.button("Train model from uploaded CSV"):
         training_df = pd.read_csv(uploaded_training_file)
-        training_path = ROOT_DIR / "data" / "uploaded_training_data.csv"
+        training_path = DATA_DIR / "uploaded_training_data.csv"
         training_path.parent.mkdir(parents=True, exist_ok=True)
         training_df.to_csv(training_path, index=False)
         with st.spinner("Training model on uploaded dataset..."):
-            train_and_persist(dataset_path=training_path, output_dir=ARTIFACTS_DIR)
+            train_and_persist(
+                dataset_path=training_path,
+                output_dir=ARTIFACTS_DIR,
+                candidate_models=("logistic",),
+            )
         st.success("Training completed from uploaded dataset.")
 
 if data_mode == "Upload scoring CSV":

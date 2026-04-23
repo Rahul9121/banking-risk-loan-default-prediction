@@ -2,7 +2,7 @@
 Credit-risk scoring project that predicts loan default probability, segments portfolio risk bands, and visualizes delinquency trends in a Streamlit dashboard.
 
 ## Tech stack
-- Python (Logistic Regression + optional XGBoost)
+- Python (Logistic Regression default, optional XGBoost)
 - SQL analytics query templates
 - Streamlit dashboard
 - FastAPI scoring API (Render-ready)
@@ -21,6 +21,11 @@ Credit-risk scoring project that predicts loan default probability, segments por
 python -m venv .venv
 .venv\Scripts\Activate.ps1
 pip install -r requirements.txt
+```
+
+Optional XGBoost install (not required for Streamlit deployment):
+```bash path=null start=null
+pip install xgboost
 ```
 
 ### Train model (creates demo dataset automatically if none exists)
@@ -46,6 +51,11 @@ You can train with Kaggle datasets:
 Use:
 ```bash path=null start=null
 python scripts/train_model.py --dataset "data/your_dataset.csv"
+```
+
+Use XGBoost explicitly (only if installed):
+```bash path=null start=null
+python scripts/train_model.py --dataset "data/your_dataset.csv" --models logistic xgboost
 ```
 
 The training logic auto-detects a target using one of:
@@ -83,6 +93,10 @@ git push -u origin main
 
 You will receive a public URL like:
 `https://<your-app-name>.streamlit.app`
+
+Deployment note:
+- This repo includes `.python-version` and `runtime.txt` pinned to Python 3.11 for better package compatibility on Streamlit Cloud.
+- Streamlit runtime artifacts are written to temporary storage to avoid permission issues on hosted environments.
 
 ## 5) Optional: Deploy model API to Render
 1. Push this repo to GitHub.

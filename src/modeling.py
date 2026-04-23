@@ -150,7 +150,7 @@ def train_single_model(
 
 def train_and_select_model(
     raw_df: pd.DataFrame,
-    candidate_models: Iterable[str] = ("logistic", "xgboost"),
+    candidate_models: Iterable[str] = ("logistic",),
     random_state: int = 42,
 ) -> dict[str, Any]:
     prepared = prepare_portfolio_frame(raw_df, random_state=random_state)

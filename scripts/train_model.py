@@ -37,7 +37,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--models",
         nargs="+",
-        default=["logistic", "xgboost"],
+        default=["logistic"],
         help="Candidate models to evaluate. Supported: logistic, xgboost.",
     )
     return parser.parse_args()

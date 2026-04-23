@@ -15,7 +15,7 @@ def train_and_persist(
     dataset_path: Path | None = None,
     output_dir: Path | None = None,
     demo_rows: int = 5000,
-    candidate_models: Iterable[str] = ("logistic", "xgboost"),
+    candidate_models: Iterable[str] = ("logistic",),
     random_state: int = 42,
 ) -> dict[str, Any]:
     dataset_path = Path(dataset_path) if dataset_path is not None else DEFAULT_DATASET_PATH
